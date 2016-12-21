@@ -81,11 +81,16 @@ class MyPlayer: public rwsfi2016_libs::Player
             //Start Running from hunters if any is closer than 2.5m
             if(minDist<2.0)
             {
-                std::cout<<"Escaping"<<std::endl;
+                marker.scale.z = 0.4;
                 marker.text="\nAte Logo!!!";
                 double angToMove= -getAngleToPLayer(hunters_team->players[closer]);
                 move(msg.max_displacement, angToMove);
                 move(msg.max_displacement, 0);
+                if(minDist<0.4)
+                {
+                    marker.scale.z = 0.7;
+                    marker.text="\nADEUS AMIGOS! \nVOU MORRER!";
+                }
             }
             //No Hunters nearby, Let's hunt the closer prey
             else
@@ -102,9 +107,14 @@ class MyPlayer: public rwsfi2016_libs::Player
                     }
                 }
                 double angToPrey=getAngleToPLayer(preys_team->players[toPrey]);
-                std::cout<<"Hunting"<<std::endl;
+                marker.scale.z = 0.4;
                 marker.text="\nAnda ca ao pai";
                 move(msg.max_displacement, angToPrey);
+                if(minDist<0.4)
+                {
+                    marker.scale.z = 0.7;
+                    marker.text="\nJA FOSTES! \nDEIXA LA!";
+                }
             }
         }
         publ.publish(marker);
