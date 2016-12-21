@@ -82,7 +82,7 @@ class MyPlayer: public rwsfi2016_libs::Player
             if(minDist<2.0)
             {
                 std::cout<<"Escaping"<<std::endl;
-                marker.text="Ate Logo!!!";
+                marker.text="\nAte Logo!!!";
                 double angToMove= -getAngleToPLayer(hunters_team->players[closer]);
                 move(msg.max_displacement, angToMove);
                 move(msg.max_displacement, 0);
@@ -103,7 +103,7 @@ class MyPlayer: public rwsfi2016_libs::Player
                 }
                 double angToPrey=getAngleToPLayer(preys_team->players[toPrey]);
                 std::cout<<"Hunting"<<std::endl;
-                marker.text="Anda ca ao pai";
+                marker.text="\nAnda ca ao pai";
                 move(msg.max_displacement, angToPrey);
             }
         }
