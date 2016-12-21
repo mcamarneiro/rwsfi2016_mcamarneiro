@@ -27,14 +27,40 @@ class MyPlayer: public rwsfi2016_libs::Player
 
 
         double hunt=1000, run=10;
+        bool running=false;
         for(int i=0; i< 3; i++)
         {
-            if(getDistanceToPlayer(hunters_team->players[i]))
-                    move(msg.max_displacement, 0);
+            if(getDistanceToPlayer(hunters_team->players[i])<5)
+            {
+                running=true;
+                double ang=getAngleToPLayer(hunters_team->players[i]);
+                if(ang>=0 && ang<=M_PI/2 )
+                        move(msg.max_displacement, -M_PI/30);
 
-            //else if(my_team.)
-            else
-                    move(0,0);
+                else if(ang<=0 && ang>=-M_PI/2 )
+                        move(msg.max_displacement, M_PI/30);
+            }
+        }
+        if (!running)
+        {
+            double minDist=100;
+            int toPrey=0;
+            for(int i=0; i<3; i++)
+            {
+                double dist = getDistanceToPlayer(preys_team->players[i]);
+                if(dist < minDist)
+                {
+                    minDist=dist;
+                    toPrey=i;
+                }
+            }
+            double angToPrey=getAngleToPLayer(preys_team->players[toPrey]);
+            if(angToPrey>M_PI/30)
+               angToPrey=M_PI/30;
+            else if(angToPrey<-M_PI/30)
+                angToPrey=-M_PI/30;
+
+            move(msg.max_displacement, angToPrey);
         }
       //Behaviour follow the closest prey
       //move(msg.max_displacement, M_PI/30);
