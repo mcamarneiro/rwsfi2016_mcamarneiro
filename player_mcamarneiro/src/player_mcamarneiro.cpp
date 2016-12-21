@@ -3,7 +3,7 @@
 
 using namespace std;
 using namespace ros;
-
+int n=0;
 
 /**
  * @brief MyPlayer extends class Player, i.e., there are additional things I can do with MyPlayer and not with any Player, e.g., to order a movement.
@@ -27,29 +27,44 @@ class MyPlayer: public rwsfi2016_libs::Player
         double xPos=0, yPos=0;
         xPos=getPose().getOrigin().x();
         yPos=getPose().getOrigin().y();
+        double distCenter=sqrt(xPos*xPos + yPos*yPos);
 
-        if(xPos>14 || xPos<-14 || yPos<-14 || yPos>14)
+        if(distCenter>=6.8)
         {
+            n++;
+            if(n<20)
             move(msg.max_displacement, M_PI/30);
-            end=true;
+            else
+            move(msg.max_displacement, M_PI/90);
         }
         else
         {
+            n=0;
+            int minDist=10, closer=0;
+            //Compute Minimum Distance to Hunters
             for(int i=0; i< 3; i++)
             {
-                if(getDistanceToPlayer(hunters_team->players[i])<2.5)
+                int tmp=getDistanceToPlayer(hunters_team->players[i]);
+                if(tmp<minDist)
                 {
-                    running=true;
-                    double angToMove= -getAngleToPLayer(hunters_team->players[i]);
-                    if(angToMove>=M_PI/30 )
-                            move(msg.max_displacement, M_PI/30);
-                    else if(angToMove<=-M_PI/30 )
-                            move(msg.max_displacement, -M_PI/30);
+                    minDist=tmp;
+                    closer=i;
                 }
             }
-            if (!running)
+            //Start Running from hunters if any is closer than 2.5m
+            if(minDist<2.5)
             {
-                double minDist=100;
+                double angToMove= -getAngleToPLayer(hunters_team->players[closer]);
+                if(angToMove>=M_PI/30 )
+                        angToMove= M_PI/30;
+                else if(angToMove<=-M_PI/30 )
+                        angToMove=-M_PI/30;
+                move(msg.max_displacement, angToMove);
+            }
+            //No Hunters nearby, Let's hunt the closer prey
+            else
+            {
+                double minDist=20;
                 int toPrey=0;
                 for(int i=0; i<3; i++)
                 {
@@ -88,7 +103,6 @@ int main(int argc, char** argv)
 
   //initialize ROS stuff
   ros::init(argc, argv, my_name);
-
   //Creating an instance of class MyPlayer
   MyPlayer my_player(my_name, my_pet);
 
