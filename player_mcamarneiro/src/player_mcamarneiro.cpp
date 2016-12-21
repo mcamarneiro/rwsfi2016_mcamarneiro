@@ -8,6 +8,8 @@ using namespace ros;
 /**
  * @brief MyPlayer extends class Player, i.e., there are additional things I can do with MyPlayer and not with any Player, e.g., to order a movement.
  */
+
+
 class MyPlayer: public rwsfi2016_libs::Player
 {
   public: 
@@ -23,8 +25,19 @@ class MyPlayer: public rwsfi2016_libs::Player
     {
       //Custom play behaviour. Now I will win the game
 
+
+        double hunt=1000, run=10;
+        for(int i=0; i< 3; i++)
+        {
+            if(getDistanceToPlayer(hunters_team->players[i]))
+                    move(msg.max_displacement, 0);
+
+            //else if(my_team.)
+            else
+                    move(0,0);
+        }
       //Behaviour follow the closest prey
-      move(msg.max_displacement, M_PI/30);
+      //move(msg.max_displacement, M_PI/30);
     }
 };
 
