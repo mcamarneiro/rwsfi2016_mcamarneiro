@@ -20,49 +20,54 @@ class MyPlayer: public rwsfi2016_libs::Player
      * @param pet_name pet name
      */
     MyPlayer(string player_name, string pet_name="/dog"): Player(player_name, pet_name){};
-
     void play(const rwsfi2016_msgs::MakeAPlay& msg)
     {
-      //Custom play behaviour. Now I will win the game
+        bool running=false, end=false;
 
-        //move(msg.max_displacement, M_PI/30);
-        double hunt=1000, run=10;
-        bool running=false;
-        for(int i=0; i< 3; i++)
+        double xPos=0, yPos=0;
+        xPos=getPose().getOrigin().x();
+        yPos=getPose().getOrigin().y();
+
+        if(xPos>14 || xPos<-14 || yPos<-14 || yPos>14)
         {
-            if(getDistanceToPlayer(hunters_team->players[i])<3.5)
-            {
-                running=true;
-                double angToMove= -getAngleToPLayer(hunters_team->players[i]);
-                if(angToMove>=M_PI/30 )
-                        move(msg.max_displacement, M_PI/30);
-                else if(angToMove<=-M_PI/30 )
-                        move(msg.max_displacement, -M_PI/30);
-            }
+            move(msg.max_displacement, M_PI/30);
+            end=true;
         }
-        if (!running)
+        else
         {
-            double minDist=100;
-            int toPrey=0;
-            for(int i=0; i<3; i++)
+            for(int i=0; i< 3; i++)
             {
-                double dist = getDistanceToPlayer(preys_team->players[i]);
-                if(dist < minDist)
+                if(getDistanceToPlayer(hunters_team->players[i])<2.5)
                 {
-                    minDist=dist;
-                    toPrey=i;
+                    running=true;
+                    double angToMove= -getAngleToPLayer(hunters_team->players[i]);
+                    if(angToMove>=M_PI/30 )
+                            move(msg.max_displacement, M_PI/30);
+                    else if(angToMove<=-M_PI/30 )
+                            move(msg.max_displacement, -M_PI/30);
                 }
             }
-            double angToPrey=getAngleToPLayer(preys_team->players[toPrey]);
-            if(angToPrey>M_PI/30)
-               angToPrey=M_PI/30;
-            else if(angToPrey<-M_PI/30)
-                angToPrey=-M_PI/30;
-
-            move(msg.max_displacement, angToPrey);
+            if (!running)
+            {
+                double minDist=100;
+                int toPrey=0;
+                for(int i=0; i<3; i++)
+                {
+                    double dist = getDistanceToPlayer(preys_team->players[i]);
+                    if(dist < minDist)
+                    {
+                        minDist=dist;
+                        toPrey=i;
+                    }
+                }
+                double angToPrey=getAngleToPLayer(preys_team->players[toPrey]);
+                if(angToPrey>M_PI/30)
+                   angToPrey=M_PI/30;
+                else if(angToPrey<-M_PI/30)
+                    angToPrey=-M_PI/30;
+                move(msg.max_displacement, angToPrey);
+            }
         }
-      //Behaviour follow the closest prey
-      //move(msg.max_displacement, M_PI/30);
     }
 };
 
