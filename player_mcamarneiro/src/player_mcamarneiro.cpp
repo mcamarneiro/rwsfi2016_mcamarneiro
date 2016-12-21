@@ -52,14 +52,12 @@ class MyPlayer: public rwsfi2016_libs::Player
                 }
             }
             //Start Running from hunters if any is closer than 2.5m
-            if(minDist<2.5)
+            if(minDist<2.0)
             {
+                std::cout<<"Escaping"<<std::endl;
                 double angToMove= -getAngleToPLayer(hunters_team->players[closer]);
-                if(angToMove>=M_PI/30 )
-                        angToMove= M_PI/30;
-                else if(angToMove<=-M_PI/30 )
-                        angToMove=-M_PI/30;
                 move(msg.max_displacement, angToMove);
+                move(msg.max_displacement, 0);
             }
             //No Hunters nearby, Let's hunt the closer prey
             else
@@ -76,10 +74,7 @@ class MyPlayer: public rwsfi2016_libs::Player
                     }
                 }
                 double angToPrey=getAngleToPLayer(preys_team->players[toPrey]);
-                if(angToPrey>M_PI/30)
-                   angToPrey=M_PI/30;
-                else if(angToPrey<-M_PI/30)
-                    angToPrey=-M_PI/30;
+                std::cout<<"Hunting"<<std::endl;
                 move(msg.max_displacement, angToPrey);
             }
         }
