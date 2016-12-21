@@ -25,20 +25,19 @@ class MyPlayer: public rwsfi2016_libs::Player
     {
       //Custom play behaviour. Now I will win the game
 
-
+        //move(msg.max_displacement, M_PI/30);
         double hunt=1000, run=10;
         bool running=false;
         for(int i=0; i< 3; i++)
         {
-            if(getDistanceToPlayer(hunters_team->players[i])<5)
+            if(getDistanceToPlayer(hunters_team->players[i])<3.5)
             {
                 running=true;
-                double ang=getAngleToPLayer(hunters_team->players[i]);
-                if(ang>=0 && ang<=M_PI/2 )
-                        move(msg.max_displacement, -M_PI/30);
-
-                else if(ang<=0 && ang>=-M_PI/2 )
+                double angToMove= -getAngleToPLayer(hunters_team->players[i]);
+                if(angToMove>=M_PI/30 )
                         move(msg.max_displacement, M_PI/30);
+                else if(angToMove<=-M_PI/30 )
+                        move(msg.max_displacement, -M_PI/30);
             }
         }
         if (!running)
