@@ -1,5 +1,7 @@
 #include <ros/ros.h>
 #include <rwsfi2016_libs/player.h>
+#include <visualization_msgs/Marker.h>
+#include <rwsfi2016_msgs/GameQuery.h>
 
 using namespace std;
 using namespace ros;
@@ -13,13 +15,38 @@ int n=0;
 class MyPlayer: public rwsfi2016_libs::Player
 {
   public: 
-
+        Publisher publ;
+        visualization_msgs::Marker marker;
+        ros::ServiceServer service;
     /**
      * @brief Constructor, nothing to be done here
      * @param name player name
      * @param pet_name pet name
      */
-    MyPlayer(string player_name, string pet_name="/dog"): Player(player_name, pet_name){};
+    MyPlayer(string player_name, string pet_name="/dog"): Player(player_name, pet_name)
+    {
+        publ =node.advertise<visualization_msgs::Marker>( "/bocas", 0 );
+        marker.header.frame_id = name;
+        marker.header.stamp = ros::Time();
+        marker.ns = name;
+        marker.id = 0;
+        marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
+        marker.action = visualization_msgs::Marker::ADD;
+        marker.scale.z = 0.4;
+        marker.color.a = 1.0; // Don't forget to set the alpha!
+        marker.color.r = 0.0;
+        marker.color.g = 0.0;
+        marker.color.b = 0.0;
+
+        service = node.advertiseService(name + "/game_query", &MyPlayer::serviceCallback,this);
+    };
+
+    bool serviceCallback(rwsfi2016_msgs::GameQuery::Request &req, rwsfi2016_msgs::GameQuery::Response &res )
+    {
+        res.resposta="Hello";
+        return true;
+    }
+
     void play(const rwsfi2016_msgs::MakeAPlay& msg)
     {
         bool running=false, end=false;
@@ -55,6 +82,7 @@ class MyPlayer: public rwsfi2016_libs::Player
             if(minDist<2.0)
             {
                 std::cout<<"Escaping"<<std::endl;
+                marker.text="Ate Logo!!!";
                 double angToMove= -getAngleToPLayer(hunters_team->players[closer]);
                 move(msg.max_displacement, angToMove);
                 move(msg.max_displacement, 0);
@@ -75,9 +103,11 @@ class MyPlayer: public rwsfi2016_libs::Player
                 }
                 double angToPrey=getAngleToPLayer(preys_team->players[toPrey]);
                 std::cout<<"Hunting"<<std::endl;
+                marker.text="Anda ca ao pai";
                 move(msg.max_displacement, angToPrey);
             }
         }
+        publ.publish(marker);
     }
 };
 
