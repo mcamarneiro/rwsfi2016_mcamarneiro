@@ -2,7 +2,10 @@
 #include <rwsfi2016_libs/player.h>
 #include <visualization_msgs/Marker.h>
 #include <rwsfi2016_msgs/GameQuery.h>
-
+#include <sensor_msgs/PointCloud2.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/point_types.h>
+#include <pcl_ros/point_cloud.h>
 using namespace std;
 using namespace ros;
 int n=0;
@@ -18,6 +21,10 @@ class MyPlayer: public rwsfi2016_libs::Player
         Publisher publ;
         visualization_msgs::Marker marker;
         ros::ServiceServer service;
+        Subscriber subs;
+        typedef pcl::PointXYZRGB PointT;
+        pcl::PointCloud<PointT> last_pcl;
+
     /**
      * @brief Constructor, nothing to be done here
      * @param name player name
@@ -26,6 +33,7 @@ class MyPlayer: public rwsfi2016_libs::Player
     MyPlayer(string player_name, string pet_name="/dog"): Player(player_name, pet_name)
     {
         publ =node.advertise<visualization_msgs::Marker>( "/bocas", 0 );
+        subs =node.subscribe("/object_point_cloud", 1, &MyPlayer::PclCallback,this);
         marker.header.frame_id = name;
         marker.header.stamp = ros::Time();
         marker.ns = name;
@@ -41,9 +49,28 @@ class MyPlayer: public rwsfi2016_libs::Player
         service = node.advertiseService(name + "/game_query", &MyPlayer::serviceCallback,this);
     };
 
+    void PclCallback(const sensor_msgs::PointCloud2& msg)
+    {
+        pcl::fromROSMsg(msg,last_pcl);
+    }
+
     bool serviceCallback(rwsfi2016_msgs::GameQuery::Request &req, rwsfi2016_msgs::GameQuery::Response &res )
     {
-        res.resposta="Hello";
+
+        switch (last_pcl.points.size()) {
+        case 3979:
+            res.resposta="banana";
+            break;
+        case 1570:
+            res.resposta="tomato";
+            break;
+        case 3468:
+            res.resposta="onion";
+            break;
+        default:
+            res.resposta="soda_can";
+            break;
+        }
         return true;
     }
 
