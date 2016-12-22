@@ -87,20 +87,24 @@ class MyPlayer: public rwsfi2016_libs::Player
 
         if(medblue>=50 && medblue <=90)
         {
-            res.resposta="Onion";
+            res.resposta="onion";
         }
         else if(medblue >90)
         {
-            res.resposta="Soda";
+            res.resposta="soda_can";
         }
         else if(medblue <50)
         {
             if(medgreen<76)
-                res.resposta="Tomato";
+                res.resposta="tomato";
             else
-                res.resposta="Banana";
+                res.resposta="banana";
         }
+        std::cout<<res.resposta<<std::endl;
+        std::cout<<"Size"<<last_pcl.points.size()<<std::endl;
+
         return true;
+
 
     }
 
