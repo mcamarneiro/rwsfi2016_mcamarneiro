@@ -52,26 +52,56 @@ class MyPlayer: public rwsfi2016_libs::Player
     void PclCallback(const sensor_msgs::PointCloud2& msg)
     {
         pcl::fromROSMsg(msg,last_pcl);
+
+//        switch (last_pcl.points.size()) {
+//        case 3979:
+//            std::cout <<"banana"<<std::endl;
+//            break;
+//        case 1570:
+//            std::cout <<"tomato"<<std::endl;
+//            break;
+//        case 3468:
+//            std::cout <<"onion"<<std::endl;
+//            break;
+//        default:
+//            std::cout <<"soda_can"<<std::endl;
+//            break;
+//        }
     }
 
     bool serviceCallback(rwsfi2016_msgs::GameQuery::Request &req, rwsfi2016_msgs::GameQuery::Response &res )
     {
+        double medblue=0, medgreen=0;
+        for(int i=0; i< 100; i++)
+        {
+            medblue+=last_pcl.points[i].b;
+            medgreen+=last_pcl.points[i].g;
+        }
+        medblue/=100;
+        medgreen/=100;
+        medblue=round(medblue);
+        medgreen=round(medgreen);
 
-        switch (last_pcl.points.size()) {
-        case 3979:
-            res.resposta="banana";
-            break;
-        case 1570:
-            res.resposta="tomato";
-            break;
-        case 3468:
-            res.resposta="onion";
-            break;
-        default:
-            res.resposta="soda_can";
-            break;
+        //std::cout <<"MediaBlue: "<< medblue <<std::endl;
+        //std::cout <<"MediaGreen: "<< medgreen <<std::endl;
+
+        if(medblue>=50 && medblue <=90)
+        {
+            res.resposta="Onion";
+        }
+        else if(medblue >90)
+        {
+            res.resposta="Soda";
+        }
+        else if(medblue <50)
+        {
+            if(medgreen<76)
+                res.resposta="Tomato";
+            else
+                res.resposta="Banana";
         }
         return true;
+
     }
 
     void play(const rwsfi2016_msgs::MakeAPlay& msg)
